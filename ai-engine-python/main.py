@@ -7,7 +7,6 @@ from datetime import datetime
 
 app = FastAPI()
 
-# --- CONFIGURAZIONE CORS ---
 app.add_middleware(
     CORSMiddleware,
     allow_origins=["*"], 
@@ -23,7 +22,6 @@ db_config = {
     "database": "rent_car"
 }
 
-# Modello dati aggiornato per combaciare con il nuovo form React
 class BookingRequest(BaseModel):
     vehicle_id: int
     customer_name: str
@@ -36,11 +34,7 @@ def write_booking_log(message):
     with open("ai_booking_log.txt", "a", encoding="utf-8") as f:
         timestamp = datetime.now().strftime("%Y-%m-%d %H:%M:%S")
         f.write(f"[{timestamp}] {message}\n")
-
-@app.get("/")
-def home():
-    return {"status": "online", "message": "AI Engine Elite Rent pronto"}
-
+        
 @app.post("/ai/process-booking")
 def process_booking(req: BookingRequest):
     conn = None
@@ -48,85 +42,75 @@ def process_booking(req: BookingRequest):
         conn = mysql.connector.connect(**db_config)
         cursor = conn.cursor(dictionary=True)
 
-        # 1. RECUPERA DATI VEICOLO
+        s_date = req.start_date.split('T')[0]
+        e_date = req.end_date.split('T')[0]
+
+        # 1. Recupero veicolo richiesto
         cursor.execute("SELECT * FROM vehicle WHERE id = %s", (req.vehicle_id,))
-        target_vehicle = cursor.fetchone()
-        
-        if not target_vehicle:
+        target_v = cursor.fetchone()
+        if not target_v:
             raise HTTPException(status_code=404, detail="Veicolo non trovato")
 
-        # 2. CONTROLLO DISPONIBILITÀ REALE (Sovrapposizione date)
-        # Una prenotazione si sovrappone se: (Inizio1 <= Fine2) AND (Fine1 >= Inizio2)
-        check_query = """
-            SELECT * FROM reservation 
-            WHERE vehicle_id = %s 
-            AND NOT (end_date < %s OR start_date > %s)
-        """
-        cursor.execute(check_query, (req.vehicle_id, req.start_date, req.end_date))
+        # 2. Controllo disponibilità
+        check_query = "SELECT * FROM reservation WHERE vehicle_id = %s AND %s < end_date AND %s > start_date"
+        cursor.execute(check_query, (req.vehicle_id, s_date, e_date))
         
         if cursor.fetchone():
-            # AI SUGGESTION: Cerca auto simili libere in quel periodo
-            df = pd.read_sql("SELECT * FROM vehicle", conn)
-            fuel = target_vehicle.get('fuel_type', 'Diesel')
+            # --- LOGICA ALTERNATIVE A STESSO PREZZO ---
+            cursor.execute("SELECT * FROM vehicle")
+            all_vehicles = cursor.fetchall()
             
-            # Escludiamo le auto già occupate in quelle date specifiche
-            cursor.execute("SELECT vehicle_id FROM reservation WHERE NOT (end_date < %s OR start_date > %s)", 
-                           (req.start_date, req.end_date))
+            cursor.execute("SELECT vehicle_id FROM reservation WHERE %s < end_date AND %s > start_date", (s_date, e_date))
             booked_ids = [r['vehicle_id'] for r in cursor.fetchall()]
             
-            suggestions = df[
-                (df['fuel_type'] == fuel) & 
-                (~df['id'].isin(booked_ids)) & 
-                (df['id'] != req.vehicle_id)
-            ].head(2)
+            # Recuperiamo il prezzo del veicolo target
+            target_price = target_v.get('price_per_day') or target_v.get('pricePerDay') or 0
+            
+            suggestions = []
+            for v in all_vehicles:
+                v_id = v.get('id') or v.get('ID')
+                v_price = v.get('price_per_day') or v.get('pricePerDay') or 0
+                
+                # Condizioni: ID diverso, Non prenotata, Stesso prezzo (o differenza minima di 5€)
+                if v_id != req.vehicle_id and v_id not in booked_ids:
+                    if abs(float(v_price) - float(target_price)) <= 5: 
+                        suggestions.append(v)
+                        if len(suggestions) == 3: break # Ora ne cerchiamo 3
 
-            write_booking_log(f"OCCUPATA: {req.customer_name} ({req.email}) cercava ID {req.vehicle_id} dal {req.start_date} al {req.end_date}.")
+            write_booking_log(f"OCCUPATA: {req.customer_name} cercava ID {req.vehicle_id} dal {s_date} al {e_date}. Proposte 3 alternative.")
             
             return {
                 "status": "busy", 
-                "suggestions": suggestions.to_dict(orient='records')
+                "message": "La macchina è già occupata. Ti proponiamo queste 3 alternative allo stesso prezzo:",
+                "suggestions": suggestions
             }
 
-        # 3. GESTIONE/REGISTRAZIONE UTENTE
+        # 3. Gestione Utente (Se libera)
         cursor.execute("SELECT id FROM users WHERE email = %s", (req.email,))
-        user = cursor.fetchone()
+        user_res = cursor.fetchone()
+        u_id = user_res['id'] if user_res else None
         
-        if not user:
-            # Se l'utente non esiste, lo creiamo (registrazione automatica)
-            cursor.execute(
-                "INSERT INTO users (fullname, email, phone, password) VALUES (%s, %s, %s, 'elite_pass')", 
-                (req.customer_name, req.email, req.phone)
-            )
-            user_id = cursor.lastrowid
-        else:
-            user_id = user['id']
+        if not u_id:
+            cursor.execute("INSERT INTO users (fullname, email, phone, password) VALUES (%s, %s, %s, 'elite_pass')", 
+                           (req.customer_name, req.email, req.phone))
+            u_id = cursor.lastrowid
 
-        # 4. CALCOLO PREZZO E SALVATAGGIO PRENOTAZIONE
-        d1 = datetime.strptime(req.start_date, "%Y-%m-%d")
-        d2 = datetime.strptime(req.end_date, "%Y-%m-%d")
-        total_days = (d2 - d1).days
-        if total_days <= 0: total_days = 1 # Minimo 1 giorno
-        
-        daily_rate = target_vehicle.get('price_per_day') or target_vehicle.get('pricePerDay') or 50.0
-        total_price = float(daily_rate) * total_days
+        # 4. Calcolo Prezzo e Salvataggio
+        d1, d2 = datetime.strptime(s_date, "%Y-%m-%d"), datetime.strptime(e_date, "%Y-%m-%d")
+        total_days = max((d2 - d1).days, 1)
+        total_price = float(target_price) * total_days
 
-        query = """
-            INSERT INTO reservation (vehicle_id, user_id, start_date, end_date, total_price) 
-            VALUES (%s, %s, %s, %s, %s)
-        """
-        cursor.execute(query, (req.vehicle_id, user_id, req.start_date, req.end_date, total_price))
+        cursor.execute("INSERT INTO reservation (vehicle_id, user_id, start_date, end_date, total_price) VALUES (%s, %s, %s, %s, %s)",
+                       (req.vehicle_id, u_id, s_date, e_date, total_price))
         conn.commit()
         
-        write_booking_log(f"SUCCESS: {req.customer_name} ha prenotato ID {req.vehicle_id} per {total_days} giorni. Totale: {total_price}€")
-        
-        return {
-            "status": "success", 
-            "total_price": total_price
-        }
+        write_booking_log(f"SUCCESS: {req.customer_name} ha prenotato ID {req.vehicle_id} dal {s_date} al {e_date}.")
+        return {"status": "success", "total_price": total_price}
 
     except Exception as e:
-        print(f"Errore: {e}")
+        print(f"ERRORE AI: {e}")
         raise HTTPException(status_code=500, detail=str(e))
     finally:
         if conn and conn.is_connected():
+            cursor.close()
             conn.close()
