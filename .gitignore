@@ -1,0 +1,33 @@
+# --- JAVA (Spring Boot) ---
+backend-springboot/target/
+backend-springboot/.mvn/wrapper/maven-wrapper.jar
+backend-springboot/*.class
+backend-springboot/.metadata
+backend-springboot/bin/
+
+# --- PYTHON (AI Engine) ---
+ai-engine-python/__pycache__/
+ai-engine-python/*.py[cod]
+ai-engine-python/.venv/
+ai-engine-python/.env
+ai-engine-python/ai_booking_log.txt
+ai-engine-python/logs/*.log
+
+# --- REACT (Frontend) ---
+frontend-react/node_modules/
+frontend-react/build/
+frontend-react/.env.local
+frontend-react/.env.development.local
+frontend-react/.env.test.local
+frontend-react/.env.production.local
+
+# --- IDE & OS ---
+.idea/
+.vscode/
+*.swp
+*.bak
+.DS_Store
+Thumbs.db
+
+# --- DATABASE ---
+database/*.log

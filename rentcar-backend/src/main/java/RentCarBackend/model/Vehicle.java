@@ -7,7 +7,7 @@ import lombok.NoArgsConstructor;
 import lombok.Setter;
 
 @Entity
-@Table(name = "vehicle") // Forza il nome della tabella in minuscolo
+@Table(name = "vehicle")
 @Getter 
 @Setter
 @NoArgsConstructor 
@@ -21,15 +21,30 @@ public class Vehicle {
     private String brand;
     private String model;
 
-    @Column(name = "fuel_type") // Collega fuelType a fuel_type nel DB
+    @Column(name = "price_per_day")
+    private Double pricePerDay;
+
+    @Column(name = "fuel_type")
     private String fuelType;
 
-    @Column(name = "average_consumption") // Collega averageConsumption a average_consumption
-    private Double averageConsumption;
-    
-    @Column(name = "photo_internal") // Deve corrispondere esattamente al nome nel DB
+    @Column(name = "average_consumption")
+    private String averageConsumption; // Cambiato a String per includere "L/100km"
+
+    @Column(name = "transmission")
+    private String transmission; // Manuale / Automatico
+
+    @Column(name = "power")
+    private String power; // es: "150 CV"
+
+    @Column(name = "seats")
+    private Integer seats;
+
+    @Column(name = "photo_internal")
     private String photoInternal;
 
-    @Column(name = "photo_external") // Deve corrispondere esattamente al nome nel DB
+    @Column(name = "photo_external")
     private String photoExternal;
+
+    @Column(name = "description", columnDefinition = "TEXT")
+    private String description;
 }
