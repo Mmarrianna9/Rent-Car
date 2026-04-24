@@ -110,3 +110,9 @@ Dettagli dei Componenti
 
 
 ./mvnw spring-boot:run
+
+Vogliamo gestire il Login (per far sì che l'utente non debba inserire i dati ogni volta)?
+
+Vuoi aggiungere la Galleria fotografica completa (le 2 foto per ogni auto) che avevamo accennato?
+
+Oppure vuoi che il sistema invii una Email di conferma (simulata) quando la prenotazione va a buon fine?

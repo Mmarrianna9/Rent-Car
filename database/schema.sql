@@ -65,3 +65,4 @@ INSERT INTO vehicle (brand, model, fuel_type, average_consumption, photo_interna
 ('Audi', 'Q4 e-tron', 'Electric', 0.0, 'q4_int.jpg', 'q4_ext.jpg'),
 ('MG', 'MG4', 'Electric', 0.0, 'mg4_int.jpg', 'mg4_ext.jpg'),
 ('Tesla', 'Model Y', 'Electric', 0.0, 'teslay_int.jpg', 'teslay_ext.jpg');
+

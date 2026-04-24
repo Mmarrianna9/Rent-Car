@@ -27,8 +27,8 @@ public class Vehicle {
     @Column(name = "fuel_type")
     private String fuelType;
 
-    @Column(name = "average_consumption")
-    private String averageConsumption; // Cambiato a String per includere "L/100km"
+    @Column(name = "consumption")
+    private String consumption; // Cambiato a String per includere "L/100km"
 
     @Column(name = "transmission")
     private String transmission; // Manuale / Automatico
