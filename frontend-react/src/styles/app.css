@@ -1,0 +1,71 @@
+@import "tailwindcss";
+
+:root {
+  --antracite: #1a1a1b;
+  --bronzo: #d4a373;
+  --crema: #fefae0;
+  --terra: #bc6c25;
+}
+
+/* NAVBAR ULTRA-SOTTILE */
+.nav-elite {
+  background-color: var(--antracite);
+  color: var(--crema);
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  padding: 0 40px; /* Tolto il padding verticale */
+  height: 50px;    /* Altezza fissa molto bassa */
+  border-bottom: 1px solid var(--bronzo);
+  position: sticky;
+  top: 0;
+  z-index: 1000;
+}
+
+/* CAROUSEL FULL WIDTH */
+.carousel-container {
+  width: 100%;
+  height: 500px; /* Altezza del carosello */
+  overflow: hidden;
+  background-color: var(--antracite);
+}
+
+.carousel-img {
+  width: 100%;
+  height: 500px;
+  object-fit: cover; /* L'immagine riempie lo spazio senza schiacciarsi */
+}
+
+/* Overlay scuro sull'immagine per far risaltare il testo */
+.carousel-overlay {
+  position: absolute;
+  top: 0;
+  left: 0;
+  width: 100%;
+  height: 100%;
+  background: linear-gradient(to bottom, rgba(0,0,0,0.4), rgba(0,0,0,0.7));
+  display: flex;
+  flex-direction: column;
+  justify-content: center;
+  align-items: center;
+  color: white;
+}
+.vehicle-card:hover {
+  transform: translateY(-10px);
+  box-shadow: 0 15px 30px rgba(0,0,0,0.15) !important;
+}
+
+@keyframes fadeIn {
+  from { opacity: 0; transform: translateY(10px); }
+  to { opacity: 1; transform: translateY(0); }
+}
+@keyframes slideUp {
+  from {
+    opacity: 0;
+    transform: translateY(30px);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
+}
