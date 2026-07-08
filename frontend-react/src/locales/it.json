@@ -1,0 +1,37 @@
+{
+  
+    "nav": {
+      "home": "Home",
+      "vehicles": "Flotta Auto",
+      "reservations": "Le mie Prenotazioni",
+      "contact": "Contatti",
+      "loginRegister": "ACCEDI / REGISTRATI",
+      "backToFleet": "TORNA ALLA FLOTTA"
+    },
+    "vehicle": {
+      "fuel": "Carburante",
+      "transmission": "Cambio",
+      "power": "Potenza",
+      "seats": "Posti",
+      "consumption": "Consumo",
+      "technicalDescription": "DESCRIZIONE TECNICA",
+      "noDescription": "Nessuna descrizione tecnica disponibile.",
+      "day": "giorno",
+      "askAi": "Chiedi suggerimenti AI",
+      "aiSuggests": "L'AI suggerisce anche:"
+    },
+    "form": {
+      "placeholderName": "Nome e Cognome",
+      "placeholderEmail": "La tua Email",
+      "placeholderPhone": "Telefono",
+      "checking": "CONTROLLO DISPONIBILITÀ...",
+      "bookNow": "PRENOTA ORA",
+      "alertMissing": "⚠️ Attenzione: Devi inserire Nome, Email, Telefono e Date per procedere!",
+      "busyCar": "❌ Auto occupata. Proponiamo delle alternative.",
+      "success": "✅ PRENOTAZIONE CONFERMATA!",
+      "errorApi": "Errore di connessione con il server AI."
+    },
+    "ai": {
+      "suggestionsTitle": "L'AI consiglia: Alternative allo stesso prezzo"
+    }
+  }

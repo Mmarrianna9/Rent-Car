@@ -1,0 +1,37 @@
+{
+  
+    "nav": {
+      "home": "Acasă",
+      "vehicles": "Flotă Auto",
+      "reservations": "Rezervările mele",
+      "contact": "Contact",
+      "loginRegister": "CONECTARE / ÎNREGISTRARE",
+      "backToFleet": "ÎNAPOI LA FLOTĂ"
+    },
+    "vehicle": {
+      "fuel": "Combustibil",
+      "transmission": "Transmisie",
+      "power": "Putere",
+      "seats": "Locuri",
+      "consumption": "Consum",
+      "technicalDescription": "DESCRIERE TEHNICĂ",
+      "noDescription": "Nicio descriere tehnică disponibilă.",
+      "day": "zi",
+      "askAi": "Cere sugestii AI",
+      "aiSuggests": "AI sugerează și:"
+    },
+    "form": {
+      "placeholderName": "Nume și Prenume",
+      "placeholderEmail": "Email-ul tău",
+      "placeholderPhone": "Telefon",
+      "checking": "VERIFICARE DISPONIBILITATE...",
+      "bookNow": "REZERVĂ ACUM",
+      "alertMissing": "⚠️ Atenție: Trebuie să introduceți Numele, Email-ul, Telefonul și Datele pentru a continua!",
+      "busyCar": "❌ Mașina este ocupată. Vă propunem câteva alternative.",
+      "success": "✅ REZURVARE CONFIRMATĂ!",
+      "errorApi": "Eroare de conexiune cu serverul AI."
+    },
+    "ai": {
+      "suggestionsTitle": "AI recomandă: Alternative la același preț"
+    }
+  }

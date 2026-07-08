@@ -1,0 +1,37 @@
+{
+  
+    "nav": {
+      "home": "Home",
+      "vehicles": "Car Fleet",
+      "reservations": "My Bookings",
+      "contact": "Contact Us",
+      "loginRegister": "LOGIN / REGISTER",
+      "backToFleet": "BACK TO FLEET"
+    },
+    "vehicle": {
+      "fuel": "Fuel Type",
+      "transmission": "Transmission",
+      "power": "Power",
+      "seats": "Seats",
+      "consumption": "Consumption",
+      "technicalDescription": "TECHNICAL DESCRIPTION",
+      "noDescription": "No technical description available.",
+      "day": "day",
+      "askAi": "Ask AI for Suggestions",
+      "aiSuggests": "AI also suggests:"
+    },
+    "form": {
+      "placeholderName": "Full Name",
+      "placeholderEmail": "Your Email",
+      "placeholderPhone": "Phone Number",
+      "checking": "CHECKING AVAILABILITY...",
+      "bookNow": "BOOK NOW",
+      "alertMissing": "⚠️ Attention: You must enter Name, Email, Phone, and Dates to proceed!",
+      "busyCar": "❌ Car is busy. We suggest some alternatives.",
+      "success": "✅ BOOKING CONFIRMED!",
+      "errorApi": "Connection error with the AI server."
+    },
+    "ai": {
+      "suggestionsTitle": "AI Recommends: Alternatives at the same price"
+    }
+  }
