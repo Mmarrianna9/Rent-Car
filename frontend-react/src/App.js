@@ -1,5 +1,6 @@
 import React, { useState, useEffect } from 'react';
 import axios from 'axios';
+import { useTranslation } from 'react-i18next'; // 👈 1. IMPORTA IL HOOK
 import Navbar from './components/Navbar';
 import HeroCarousel from './components/HeroCarousel';
 import VehicleDetail from './components/VehicleDetail';
@@ -13,13 +14,33 @@ function App() {
   const [user, setUser] = useState(null); 
   const [isAuthOpen, setIsAuthOpen] = useState(false);
 
-  useEffect(() => {
-    axios.get('http://localhost:8080/api/vehicles')
-      .then(res => {
-        setVehicles(res.data);
-      })
-      .catch(err => console.error("Errore database:", err));
-  }, []);
+  const { i18n } = useTranslation(); // 👈 2. AGGIUNGI IL HOOK PER LA LINGUA
+
+  // 3. Estraiamo in modo sicuro la lingua a 2 lettere (it, en, ro, ru)
+  const currentLang = i18n.language ? i18n.language.substring(0, 2) : 'it';
+useEffect(() => {
+    // Passiamo l'header con la lingua corrente a Spring Boot
+    axios.get('http://localhost:8080/api/vehicles', {
+      headers: {
+        'Accept-Language': currentLang
+      }
+    })
+    .then(res => {
+      setVehicles(res.data);
+      
+      // Se l'utente sta guardando i dettagli di un veicolo 
+      // e cambia lingua, aggiorniamo anche il veicolo selezionato con la nuova descrizione!
+      if (selectedVehicle) {
+        const updatedVehicle = res.data.find(v => v.id === selectedVehicle.id);
+        if (updatedVehicle) {
+          setSelectedVehicle(updatedVehicle);
+        }
+      }
+    })
+    .catch(err => console.error("Errore database:", err));
+
+  }, [currentLang, selectedVehicle]);
+ // 👈 5. FONDAMENTALE: Ogni volta che currentLang cambia, React riesegue questo blocco!
 
   const handleLoginSuccess = (userData) => {
     setUser(userData);

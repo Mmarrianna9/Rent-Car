@@ -1,10 +1,13 @@
 package RentCarBackend.controller;
 
 import java.util.List;
+import jakarta.persistence.EntityManager;
+import jakarta.persistence.PersistenceContext;
 
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.web.bind.annotation.CrossOrigin;
 import org.springframework.web.bind.annotation.GetMapping;
+import org.springframework.web.bind.annotation.RequestHeader;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
 
@@ -13,14 +16,42 @@ import RentCarBackend.repository.VehicleRepository;
 
 @RestController
 @RequestMapping("/api/vehicles")
-@CrossOrigin(origins = "http://localhost:3000")
+// 🌐 CORRETTO: allowedHeaders = "*" assicura che il controller accetti l'header modificato da Axios
+@CrossOrigin(origins = "http://localhost:3000", allowedHeaders = "*")
 public class VehicleController {
+
     @Autowired
     private VehicleRepository vehicleRepository;
 
-    @GetMapping
-    public List<Vehicle> getAllVehicles() {
-        return vehicleRepository.findAll();
-    }
+    // 🕵️‍♂️ EntityManager serve a scollegare temporaneamente l'entità dal database prima di modificarla
+    @PersistenceContext
+    private EntityManager entityManager;
 
+    @GetMapping
+    public List<Vehicle> getAllVehicles(
+        @RequestHeader(value = "Accept-Language", defaultValue = "it") String lang
+    ) {
+        // 1. Recuperiamo tutti i veicoli dal database
+        List<Vehicle> vehicles = vehicleRepository.findAll();
+        
+        // 2. Estraiamo in modo sicuro solo i primi 2 caratteri della lingua (es: "en", "ro", "ru")
+        String cleanLang = "it";
+        if (lang != null && lang.length() >= 2) {
+            cleanLang = lang.substring(0, 2).toLowerCase().trim();
+        }
+        
+        // Stampa di controllo nel terminale di Spring Boot per monitorare le richieste in tempo reale
+        System.out.println("--- LINGUA RICHIESTA DA REACT: [" + cleanLang + "] ---");
+        
+        // 3. Mappiamo dinamicamente la descrizione corretta prima di inviare il JSON
+        for (Vehicle vehicle : vehicles) {
+            // Slegando l'oggetto, evitiamo che Hibernate sovrascriva o blocchi le modifiche in memoria
+            entityManager.detach(vehicle);
+            
+            String localizedDesc = vehicle.getLocalizedDescription(cleanLang);
+            vehicle.setDescription(localizedDesc);
+        }
+        
+        return vehicles;
+    }
 }
