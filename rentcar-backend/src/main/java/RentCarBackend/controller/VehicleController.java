@@ -1,10 +1,7 @@
 package RentCarBackend.controller;
 
 import java.util.List;
-import jakarta.persistence.EntityManager;
-import jakarta.persistence.PersistenceContext;
 
-import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.web.bind.annotation.CrossOrigin;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.RequestHeader;
@@ -13,6 +10,8 @@ import org.springframework.web.bind.annotation.RestController;
 
 import RentCarBackend.model.Vehicle;
 import RentCarBackend.repository.VehicleRepository;
+import jakarta.persistence.EntityManager;
+import jakarta.persistence.PersistenceContext;
 
 @RestController
 @RequestMapping("/api/vehicles")
@@ -20,16 +19,20 @@ import RentCarBackend.repository.VehicleRepository;
 @CrossOrigin(origins = "http://localhost:3000", allowedHeaders = "*")
 public class VehicleController {
 
-    @Autowired
-    private VehicleRepository vehicleRepository;
+    private final VehicleRepository vehicleRepository;
 
     // 🕵️‍♂️ EntityManager serve a scollegare temporaneamente l'entità dal database prima di modificarla
     @PersistenceContext
     private EntityManager entityManager;
 
+    // 🛠️ Costruttore pubblico per una Dependency Injection pulita ed evitare errori di compilazione
+    public VehicleController(VehicleRepository vehicleRepository) {
+        this.vehicleRepository = vehicleRepository;
+    }
+
     @GetMapping
     public List<Vehicle> getAllVehicles(
-        @RequestHeader(value = "Accept-Language", defaultValue = "it") String lang
+        @RequestHeader(value = "Accept-Language", required = false, defaultValue = "it") String lang
     ) {
         // 1. Recuperiamo tutti i veicoli dal database
         List<Vehicle> vehicles = vehicleRepository.findAll();
