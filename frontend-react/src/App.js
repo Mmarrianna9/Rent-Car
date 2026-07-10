@@ -11,36 +11,36 @@ function App() {
   const [vehicles, setVehicles] = useState([]);
   const [showResults, setShowResults] = useState(false);
   const [selectedVehicle, setSelectedVehicle] = useState(null);
-  const [user, setUser] = useState(null); 
+  const [user, setUser] = useState(null);
   const [isAuthOpen, setIsAuthOpen] = useState(false);
 
   const { i18n } = useTranslation(); // 👈 2. AGGIUNGI IL HOOK PER LA LINGUA
 
   // 3. Estraiamo in modo sicuro la lingua a 2 lettere (it, en, ro, ru)
   const currentLang = i18n.language ? i18n.language.substring(0, 2) : 'it';
-useEffect(() => {
+  useEffect(() => {
     // Passiamo l'header con la lingua corrente a Spring Boot
-    axios.get('http://localhost:8080/api/vehicles', {
+    axios.get('https://rent-car-hs75.onrender.com/api/vehicles', {
       headers: {
         'Accept-Language': currentLang
       }
     })
-    .then(res => {
-      setVehicles(res.data);
-      
-      // Se l'utente sta guardando i dettagli di un veicolo 
-      // e cambia lingua, aggiorniamo anche il veicolo selezionato con la nuova descrizione!
-      if (selectedVehicle) {
-        const updatedVehicle = res.data.find(v => v.id === selectedVehicle.id);
-        if (updatedVehicle) {
-          setSelectedVehicle(updatedVehicle);
+      .then(res => {
+        setVehicles(res.data);
+
+        // Se l'utente sta guardando i dettagli di un veicolo 
+        // e cambia lingua, aggiorniamo anche il veicolo selezionato con la nuova descrizione!
+        if (selectedVehicle) {
+          const updatedVehicle = res.data.find(v => v.id === selectedVehicle.id);
+          if (updatedVehicle) {
+            setSelectedVehicle(updatedVehicle);
+          }
         }
-      }
-    })
-    .catch(err => console.error("Errore database:", err));
+      })
+      .catch(err => console.error("Errore database:", err));
 
   }, [currentLang, selectedVehicle]);
- // 👈 5. FONDAMENTALE: Ogni volta che currentLang cambia, React riesegue questo blocco!
+  // 👈 5. FONDAMENTALE: Ogni volta che currentLang cambia, React riesegue questo blocco!
 
   const handleLoginSuccess = (userData) => {
     setUser(userData);
@@ -67,10 +67,10 @@ useEffect(() => {
 
   return (
     <div style={{ backgroundColor: '#faf9f6', minHeight: '100vh', margin: 0, padding: 0 }}>
-      <Navbar 
-        onHomeClick={resetToHome} 
-        onSearchClick={handleSearchClick} 
-        onAuthClick={() => setIsAuthOpen(true)} 
+      <Navbar
+        onHomeClick={resetToHome}
+        onSearchClick={handleSearchClick}
+        onAuthClick={() => setIsAuthOpen(true)}
       />
 
       {isAuthOpen && !user ? (
