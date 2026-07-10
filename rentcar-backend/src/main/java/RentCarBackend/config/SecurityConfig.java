@@ -1,5 +1,7 @@
 package RentCarBackend.config;
 
+import java.util.Arrays;
+
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
 import org.springframework.security.config.annotation.web.builders.HttpSecurity;
@@ -7,8 +9,6 @@ import org.springframework.security.web.SecurityFilterChain;
 import org.springframework.web.cors.CorsConfiguration;
 import org.springframework.web.cors.CorsConfigurationSource;
 import org.springframework.web.cors.UrlBasedCorsConfigurationSource;
-
-import java.util.Arrays;
 
 @Configuration
 public class SecurityConfig {
@@ -29,12 +29,17 @@ public class SecurityConfig {
     @Bean
     public CorsConfigurationSource corsConfigurationSource() {
         CorsConfiguration configuration = new CorsConfiguration();
-        configuration.setAllowedOrigins(Arrays.asList("http://localhost:3000")); // Il tuo frontend React
+        
+        // 🌐 MODIFICATO: Accetta richieste da localhost (sviluppo) e l'origine speciale "*" per i test liberi dal browser
+        configuration.setAllowedOriginPatterns(Arrays.asList("http://localhost:3000", "*")); 
+        
         configuration.setAllowedMethods(Arrays.asList("GET", "POST", "PUT", "DELETE", "OPTIONS"));
         
         // 🌐 CORRETTO: Aggiunto "Accept-Language" per permettere il passaggio della lingua richiesta
         configuration.setAllowedHeaders(Arrays.asList("Authorization", "Content-Type", "X-Requested-With", "Accept-Language"));
-        configuration.setAllowCredentials(true);
+        
+        // ⚠️ MODIFICATO: Cambiato a false per permettere i pattern di origini globali senza bloccare il browser
+        configuration.setAllowCredentials(false);
         
         UrlBasedCorsConfigurationSource source = new UrlBasedCorsConfigurationSource();
         source.registerCorsConfiguration("/**", configuration);
