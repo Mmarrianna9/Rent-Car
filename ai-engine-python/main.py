@@ -29,14 +29,15 @@ async def handle_options(request: Request, call_next):
     return await call_next(request)
 
 # --- 2. CONFIGURAZIONE DATABASE (USANDO VARIABILI D'AMBIENTE) ---
-# Importante: su Render, inserisci queste variabili nel pannello "Environment"
 db_config = {
-    "host": os.getenv("DB_HOST", "localhost"),
-    "user": os.getenv("DB_USER", "root"),
-    "password": os.getenv("DB_PASSWORD", ""),
-    "database": os.getenv("DB_NAME", "rent_car")
+    "host": os.getenv("DB_HOST"),        # mysql-1b2d5469...
+    "user": os.getenv("DB_USER"),        # avnadmin
+    "password": os.getenv("DB_PASSWORD"),
+    "database": os.getenv("DB_NAME"),    # defaultdb
+    "port": int(os.getenv("DB_PORT", 17997)),
+    "ssl_ca": "ca.pem",                  # QUESTO FILE È OBBLIGATORIO
+    "ssl_verify_cert": True
 }
-
 # --- 3. MODELLI E UTILITY ---
 class BookingRequest(BaseModel):
     vehicle_id: int
