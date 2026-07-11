@@ -14,7 +14,7 @@ import java.util.Optional;
 
 @RestController
 @RequestMapping("/api/auth")
-@CrossOrigin(origins = "http://localhost:3000") // Consente chiamate dal tuo frontend React
+@CrossOrigin(origins = "https://rent-car-ai-engine.onrender.com") // Consente chiamate dal tuo frontend React
 public class AuthController {
 
     @Autowired

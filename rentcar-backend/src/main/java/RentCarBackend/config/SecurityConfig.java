@@ -33,7 +33,7 @@ public class SecurityConfig {
         CorsConfiguration configuration = new CorsConfiguration();
         
         // 🌐 MODIFICATO: Accetta richieste da localhost (sviluppo) e l'origine speciale "*" per i test liberi dal browser
-        configuration.setAllowedOriginPatterns(Arrays.asList("http://localhost:3000", "*")); 
+        configuration.setAllowedOriginPatterns(Arrays.asList("https://rent-car-ai-engine.onrender.com", "*")); 
         
         configuration.setAllowedMethods(Arrays.asList("GET", "POST", "PUT", "DELETE", "OPTIONS"));
         

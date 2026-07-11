@@ -16,7 +16,7 @@ import jakarta.persistence.PersistenceContext;
 @RestController
 @RequestMapping("/api/vehicles")
 // 🌐 CORRETTO: allowedHeaders = "*" assicura che il controller accetti l'header modificato da Axios
-@CrossOrigin(origins = "http://localhost:3000", allowedHeaders = "*")
+@CrossOrigin(origins = "https://rent-car-ai-engine.onrender.com", allowedHeaders = "*")
 public class VehicleController {
 
     private final VehicleRepository vehicleRepository;

@@ -18,7 +18,7 @@ import java.util.Map;
 
 @RestController
 @RequestMapping("/ai")
-@CrossOrigin(origins = "http://localhost:3000")
+@CrossOrigin(origins = "https://rent-car-frontend-52em.onrender.com")
 public class AiController {
 
     @Autowired
