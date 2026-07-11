@@ -10,9 +10,9 @@ app = FastAPI()
 # Configurazione CORS per permettere al frontend React di comunicare con FastAPI
 app.add_middleware(
     CORSMiddleware,
-    allow_origins=["*"], 
+    allow_origins=["https://rent-car-frontend-52em.onrender.com"], 
     allow_credentials=True,
-    allow_methods=["*"],
+    allow_methods=["GET", "POST", "OPTIONS"],
     allow_headers=["*"],
 )
 
