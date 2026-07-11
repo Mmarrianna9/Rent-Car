@@ -35,7 +35,7 @@ db_config = {
     "password": os.getenv("DB_PASSWORD"),
     "database": os.getenv("DB_NAME"),    # defaultdb
     "port": int(os.getenv("DB_PORT", 17997)),
-    "ssl_ca": "ca.pem",                  # QUESTO FILE È OBBLIGATORIO
+    "ssl_ca": "/etc/secrets/ca.pem",                  # QUESTO FILE È OBBLIGATORIO
     "ssl_verify_cert": True
 }
 # --- 3. MODELLI E UTILITY ---
