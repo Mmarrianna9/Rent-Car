@@ -3,9 +3,8 @@ import { ArrowLeft, Fuel, Settings, Calendar, User, Phone, Mail, Sparkles, FileT
 import { useTranslation } from 'react-i18next';
 import axios from 'axios';
 
-// La costante legge la variabile d'ambiente o ricade su localhost per lo sviluppo
-const AI_API_URL = process.env.REACT_APP_AI_API_URL || "http://127.0.0.1:8000";
-
+//const AI_API_URL = process.env.REACT_APP_AI_API_URL || "http://127.0.0.1:8000";
+const AI_API_URL = "https://rent-car-ai-engine.onrender.com";
 const VehicleDetail = ({ vehicle, onBack, getImageUrl }) => {
   const [mainImage, setMainImage] = useState(null);
   const [loading, setLoading] = useState(false);
