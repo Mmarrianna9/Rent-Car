@@ -1,5 +1,7 @@
 from fastapi import FastAPI, HTTPException, Header
+from fastapi import FastAPI, Request
 from fastapi.middleware.cors import CORSMiddleware
+from starlette.responses import Response
 from pydantic import BaseModel
 import mysql.connector
 from datetime import datetime
@@ -15,6 +17,17 @@ app.add_middleware(
     allow_methods=["GET", "POST", "OPTIONS"],
     allow_headers=["*"],
 )
+
+# 2. Gestore esplicito per le richieste OPTIONS (Preflight)
+@app.middleware("http")
+async def handle_options(request: Request, call_next):
+    if request.method == "OPTIONS":
+        response = Response()
+        response.headers["Access-Control-Allow-Origin"] = "https://rent-car-frontend-52em.onrender.com"
+        response.headers["Access-Control-Allow-Methods"] = "POST, GET, OPTIONS"
+        response.headers["Access-Control-Allow-Headers"] = "*"
+        return response
+    return await call_next(request)
 
 db_config = {
     "host": "localhost",
