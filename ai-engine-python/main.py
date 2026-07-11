@@ -18,15 +18,16 @@ app.add_middleware(
     allow_headers=["*"],
 )
 
-@app.middleware("http")
-async def handle_options(request: Request, call_next):
-    if request.method == "OPTIONS":
-        response = Response()
-        response.headers["Access-Control-Allow-Origin"] = "https://rent-car-frontend-52em.onrender.com"
-        response.headers["Access-Control-Allow-Methods"] = "POST, GET, OPTIONS"
-        response.headers["Access-Control-Allow-Headers"] = "*"
-        return response
-    return await call_next(request)
+#--@app.middleware("http")
+#--async def handle_options(request: Request, call_next):
+#--    if request.method == "OPTIONS":
+#--        response = Response()
+#--        response.headers["Access-Control-Allow-Origin"] = "https://rent-car-frontend-52em.onrender.com"
+#--        response.headers["Access-Control-Allow-Methods"] = "POST, GET, OPTIONS"
+#--        response.headers["Access-Control-Allow-Headers"] = "*"
+#--        return response
+#--    return await call_next(request)
+
 
 # --- 2. CONFIGURAZIONE DATABASE (USANDO VARIABILI D'AMBIENTE) ---
 db_config = {
