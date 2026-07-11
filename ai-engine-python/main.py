@@ -8,6 +8,10 @@ from datetime import datetime
 from typing import Optional
 
 app = FastAPI()
+@app.get("/test")
+def test_route():
+    return {"status": "ok", "message": "Il server Python risponde correttamente!"}
+
 
 # Configurazione CORS per permettere al frontend React di comunicare con FastAPI
 app.add_middleware(
