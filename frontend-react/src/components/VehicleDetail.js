@@ -1,14 +1,17 @@
 import React, { useState, useEffect, useRef } from 'react';
 import { ArrowLeft, Fuel, Settings, Calendar, User, Phone, Mail, Sparkles, FileText, Zap, Users, Droplets } from 'lucide-react';
-import { useTranslation } from 'react-i18next'; // Gestione multilingue
+import { useTranslation } from 'react-i18next';
 import axios from 'axios';
+
+// La costante legge la variabile d'ambiente o ricade su localhost per lo sviluppo
+const AI_API_URL = process.env.REACT_APP_AI_API_URL || "http://127.0.0.1:8000";
 
 const VehicleDetail = ({ vehicle, onBack, getImageUrl }) => {
   const [mainImage, setMainImage] = useState(null);
   const [loading, setLoading] = useState(false);
   const [suggestions, setSuggestions] = useState([]); 
   const suggestionsRef = useRef(null);
-  const { t, i18n } = useTranslation(); // Recuperiamo sia 't' che 'i18n' per la lingua attiva
+  const { t, i18n } = useTranslation();
 
   const [formData, setFormData] = useState({
     fullname: '',
@@ -18,13 +21,11 @@ const VehicleDetail = ({ vehicle, onBack, getImageUrl }) => {
     endDate: ''
   });
 
-  // Funzione dinamica per pescare la descrizione corretta dal database
   const getDynamicDescription = () => {
     if (!vehicle) return "";
     return vehicle.description || t('vehicle.noDescription', 'Nessuna descrizione tecnica disponibile.');
   };
 
-  // Effetto per gestire lo scorrimento automatico verso le alternative AI senza crash
   useEffect(() => {
     if (suggestions && suggestions.length > 0 && suggestionsRef.current) {
       const timer = setTimeout(() => {
@@ -61,18 +62,16 @@ const VehicleDetail = ({ vehicle, onBack, getImageUrl }) => {
         end_date: formData.endDate
       };
 
-      // Invia la richiesta a FastAPI passando l'header della lingua corrente
-      const response = await axios.post('http://127.0.0.1:8000/ai/process-booking', payload, {
+      // CHIAMATA AGGIORNATA: Usa AI_API_URL invece dell'indirizzo fisso
+      const response = await axios.post(`${AI_API_URL}/ai/process-booking`, payload, {
         headers: {
           'Accept-Language': i18n.language || 'it'
         }
       });
 
       if (response.data.status === "busy") {
-        // 1. Mostriamo prima l'alert per avvisare l'utente
         alert(response.data.message || t('form.busyCar', "❌ Auto occupata. Proponiamo delle alternative."));
         
-        // 2. Normalizziamo l'array delle alternative per digerire sia snake_case che camelCase
         const normalizedSuggestions = (response.data.suggestions || []).map(item => ({
           id: item.id,
           brand: item.brand,
@@ -82,12 +81,12 @@ const VehicleDetail = ({ vehicle, onBack, getImageUrl }) => {
           description: item.description || ''
         }));
 
-        // 3. Carichiamo lo stato in modo pulito
         setSuggestions(normalizedSuggestions);
       } else {
         alert(`${t('form.success', '✅ PRENOTAZIONE CONFERMATA!')}\nTotale: €${response.data.total_price}`);
       }
     } catch (err) {
+      console.error("Errore AI:", err);
       alert(t('form.errorApi', "Errore di connessione con il server AI."));
     } finally {
       setLoading(false);
@@ -101,11 +100,9 @@ const VehicleDetail = ({ vehicle, onBack, getImageUrl }) => {
       </button>
 
       <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: '40px' }}>
-        {/* PARTE SINISTRA: FOTO E INFO TECNICHE */}
         <div>
           {mainImage && <img src={mainImage} alt={vehicle.model} style={{ width: '100%', borderRadius: '20px', boxShadow: '0 10px 20px rgba(0,0,0,0.1)' }} />}
           
-          {/* GRIGLIA DETTAGLI TECNICI */}
           <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: '10px', marginTop: '20px' }}>
             <DetailBox icon={<Fuel size={18}/>} label={t('vehicle.fuel', 'Carburante')} value={vehicle.fuel_type || vehicle.fuelType || "Diesel"} />
             <DetailBox icon={<Settings size={18}/>} label={t('vehicle.transmission', 'Cambio')} value={vehicle.transmission || "Automatico"} />
@@ -124,7 +121,6 @@ const VehicleDetail = ({ vehicle, onBack, getImageUrl }) => {
           </div>
         </div>
 
-        {/* PARTE DESTRA: FORM PRENOTAZIONE */}
         <div style={{ backgroundColor: '#fff', padding: '30px', borderRadius: '20px', border: '1px solid #eee', boxShadow: '0 4px 12px rgba(0,0,0,0.05)' }}>
           <h2 style={{ marginBottom: '5px' }}>{vehicle.brand} <span style={{ color: '#d4a373' }}>{vehicle.model}</span></h2>
           <p style={{ color: '#bc6c25', fontWeight: 'bold', fontSize: '20px', marginBottom: '20px' }}>€{vehicle.price_per_day || vehicle.pricePerDay || '50'} / {t('vehicle.day', 'giorno')}</p>
@@ -144,7 +140,6 @@ const VehicleDetail = ({ vehicle, onBack, getImageUrl }) => {
         </div>
       </div>
 
-      {/* SEZIONE ALTERNATIVE CONSIGLIATE DALL'AI */}
       {suggestions && suggestions.length > 0 && (
         <div ref={suggestionsRef} style={{ marginTop: '50px', padding: '30px', backgroundColor: '#fdfaf5', borderRadius: '25px', border: '2px solid #f5e6d3', scrollMarginTop: '40px' }}>
           <div style={{ display: 'flex', alignItems: 'center', gap: '10px', marginBottom: '20px' }}>
