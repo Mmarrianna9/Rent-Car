@@ -1,116 +1,48 @@
-import os
-from fastapi import FastAPI, HTTPException, Header, Request, Response
+from fastapi import FastAPI, HTTPException
 from fastapi.middleware.cors import CORSMiddleware
 from pydantic import BaseModel
-import mysql.connector
 from datetime import datetime
-from typing import Optional
 
-app = FastAPI()
-
-# 1. CORS "Blindato": Risponde a TUTTO e previene i 404 preflight
-app.add_middleware(
-    CORSMiddleware,
-    allow_origins=["*"],
-    allow_credentials=True,
-    allow_methods=["GET", "POST", "OPTIONS"],
-    allow_headers=["*"],
-)
-
-@app.middleware("http")
-async def add_cors_headers(request: Request, call_next):
-    if request.method == "OPTIONS":
-        return Response(status_code=200, headers={
-            "Access-Control-Allow-Origin": "*",
-            "Access-Control-Allow-Methods": "POST, GET, OPTIONS",
-            "Access-Control-Allow-Headers": "*"
-        })
-    response = await call_next(request)
-    response.headers["Access-Control-Allow-Origin"] = "*"
-    return response
-
-# 2. Configurazione Database
-db_config = {
-    "host": os.getenv("DB_HOST"),
-    "user": os.getenv("DB_USER"),
-    "password": os.getenv("DB_PASSWORD"),
-    "database": os.getenv("DB_NAME"),
-    "port": int(os.getenv("DB_PORT", 17997)),
-    "ssl_ca": "/etc/secrets/ca.pem",
-    "ssl_verify_cert": True
-}
-
-# 3. Modelli e Utility
+# Definizione del modello dati per la prenotazione
 class BookingRequest(BaseModel):
     vehicle_id: int
     customer_name: str
     email: str
     phone: str
-    start_date: str
-    end_date: str
+    start_date: datetime
+    end_date: datetime
 
-def get_localized_description(vehicle: dict, lang: str) -> str:
-    lang = (lang or "it").lower().split("-")[0].strip()
-    if lang == "en" and vehicle.get("descrizione_en"): return vehicle["descrizione_en"]
-    if lang == "ro" and vehicle.get("descrizione_ro"): return vehicle["descrizione_ro"]
-    if lang == "ru" and vehicle.get("descrizione_ru"): return vehicle["descrizione_ru"]
-    return vehicle.get("description") or ""
+app = FastAPI()
 
-# 4. Rotte
+# Configurazione CORS - ESSENZIALE per permettere al frontend di comunicare
+app.add_middleware(
+    CORSMiddleware,
+    allow_origins=["https://rent-car-frontend-52em.onrender.com"],
+    allow_credentials=True,
+    allow_methods=["*"],
+    allow_headers=["*"],
+)
+
+# Rotta di base per testare se il server è attivo
 @app.get("/")
-def home():
-    return {"status": "online"}
+def read_root():
+    return {"status": "online", "message": "Il backend è pronto per ricevere prenotazioni."}
 
+# Rotta per il processo di prenotazione
 @app.post("/ai/process-booking")
-def process_booking(req: BookingRequest, accept_language: Optional[str] = Header(None)):
-    conn = None
+def process_booking(booking: BookingRequest):
     try:
-        conn = mysql.connector.connect(**db_config)
-        cursor = conn.cursor(dictionary=True, buffered=True)
-
-        clean_lang = accept_language.split(",")[0].split("-")[0].strip() if accept_language else "it"
-        s_date = req.start_date.split('T')[0]
-        e_date = req.end_date.split('T')[0]
-
-        cursor.execute("SELECT * FROM vehicle WHERE id = %s", (req.vehicle_id,))
-        target_v = cursor.fetchone()
-        if not target_v:
-            raise HTTPException(status_code=404, detail="Veicolo non trovato")
-
-        target_price = float(target_v.get('price_per_day') or target_v.get('pricePerDay') or 0)
-
-        cursor.execute("SELECT * FROM reservation WHERE vehicle_id = %s AND %s < end_date AND %s > start_date", (req.vehicle_id, s_date, e_date))
-        if cursor.fetchone():
-            cursor.execute("SELECT * FROM vehicle WHERE id NOT IN (SELECT vehicle_id FROM reservation WHERE %s < end_date AND %s > start_date)", (s_date, e_date))
-            all_vehicles = cursor.fetchall()
-            suggestions = []
-            for v in all_vehicles[:3]:
-                suggestions.append({
-                    "id": v.get('id') or v.get('ID'),
-                    "brand": v.get('brand'),
-                    "model": v.get('model'),
-                    "pricePerDay": float(v.get('price_per_day') or v.get('pricePerDay') or 0),
-                    "description": get_localized_description(v, clean_lang)
-                })
-            return {"status": "busy", "suggestions": suggestions}
-
-        cursor.execute("SELECT id FROM users WHERE email = %s", (req.email,))
-        user_res = cursor.fetchone()
-        u_id = user_res['id'] if user_res else None
-        
-        if not u_id:
-            cursor.execute("INSERT INTO users (fullname, email, phone, password) VALUES (%s, %s, %s, 'elite_pass')", (req.customer_name, req.email, req.phone))
-            u_id = cursor.lastrowid
-
-        total_price = target_price * max((datetime.strptime(e_date, "%Y-%m-%d") - datetime.strptime(s_date, "%Y-%m-%d")).days, 1)
-        cursor.execute("INSERT INTO reservation (vehicle_id, user_id, start_date, end_date, total_price) VALUES (%s, %s, %s, %s, %s)",
-                       (req.vehicle_id, u_id, s_date, e_date, total_price))
-        conn.commit()
-        return {"status": "success", "total_price": total_price}
-
+        # Qui aggiungerai la logica del tuo motore AI
+        print(f"Ricevuta prenotazione da: {booking.customer_name}")
+        return {
+            "status": "success", 
+            "message": "Prenotazione elaborata correttamente",
+            "details": booking
+        }
     except Exception as e:
         raise HTTPException(status_code=500, detail=str(e))
-    finally:
-        if conn and conn.is_connected():
-            cursor.close()
-            conn.close()
+
+# Rotta di debug per vedere le rotte caricate (utile per capire il 404)
+@app.get("/debug/routes")
+def get_routes():
+    return {"routes": [route.path for route in app.routes]}
