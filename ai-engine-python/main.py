@@ -7,20 +7,29 @@ from datetime import datetime
 from typing import Optional
 
 app = FastAPI()
-
-# --- 1. CONFIGURAZIONE CORS OTTIMIZZATA ---
 app.add_middleware(
     CORSMiddleware,
-    allow_origins=["*"],  # Permette le richieste da qualsiasi origine
+    allow_origins=["https://rent-car-frontend-52em.onrender.com"],
     allow_credentials=True,
-    allow_methods=["GET", "POST", "OPTIONS"], # Includiamo esplicitamente OPTIONS
+    allow_methods=["GET", "POST", "OPTIONS"],
     allow_headers=["*"],
 )
 
-# Gestore esplicito per le richieste di tipo OPTIONS (preflight)
-@app.options("/{rest_of_path:path}")
-async def preflight_handler(rest_of_path: str):
-    return Response(status_code=200)
+@app.middleware("http")
+async def add_cors_headers(request: Request, call_next):
+    if request.method == "OPTIONS":
+        # Se è una richiesta preflight, rispondiamo subito con 200 OK
+        response = Response(status_code=200)
+        response.headers["Access-Control-Allow-Origin"] = "https://rent-car-frontend-52em.onrender.com"
+        response.headers["Access-Control-Allow-Methods"] = "POST, GET, OPTIONS"
+        response.headers["Access-Control-Allow-Headers"] = "*"
+        return response
+    
+    # Se non è OPTIONS, procedi normalmente
+    response = await call_next(request)
+    response.headers["Access-Control-Allow-Origin"] = "https://rent-car-frontend-52em.onrender.com"
+    return response
+
 
 # --- 2. CONFIGURAZIONE DATABASE ---
 db_config = {
