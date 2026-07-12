@@ -1,6 +1,6 @@
-import React, { useState, useEffect } from 'react';
+import React, { useState, useEffect, useCallback } from 'react';
 import axios from 'axios';
-import { useTranslation } from 'react-i18next'; // 👈 1. IMPORTA IL HOOK
+import { useTranslation } from 'react-i18next';
 import Navbar from './components/Navbar';
 import HeroCarousel from './components/HeroCarousel';
 import VehicleDetail from './components/VehicleDetail';
@@ -14,26 +14,30 @@ function App() {
   const [user, setUser] = useState(null);
   const [isAuthOpen, setIsAuthOpen] = useState(false);
 
-  const { i18n } = useTranslation(); // 👈 2. AGGIUNGI IL HOOK PER LA LINGUA
-
-  // 3. Estraiamo in modo sicuro la lingua a 2 lettere (it, en, ro, ru)
+  const { i18n } = useTranslation();
   const currentLang = i18n.language ? i18n.language.substring(0, 2) : 'it';
- 
-useEffect(() => {
-  // Passiamo l'header con la lingua corrente
-  axios.get('https://rent-car-hs75.onrender.com/api/vehicles', {
-    headers: {
-      'Accept-Language': currentLang
-    }
-  })
-  .then(res => {
-    setVehicles(res.data);
-  })
-  .catch(err => console.error("Errore database:", err));
 
-}, [currentLang]);
-        
-  // 👈 5. FONDAMENTALE: Ogni volta che currentLang cambia, React riesegue questo blocco!
+  // 1. Caricamento veicoli ottimizzato
+  useEffect(() => {
+    let isMounted = true; // Previene aggiornamenti di stato su componenti smontati
+    
+    axios.get('https://rent-car-hs75.onrender.com/api/vehicles', {
+      headers: { 'Accept-Language': currentLang }
+    })
+    .then(res => {
+      if (isMounted) setVehicles(res.data);
+    })
+    .catch(err => console.error("Errore database:", err));
+
+    return () => { isMounted = false; };
+  }, [currentLang]); 
+
+  // 2. Funzione stabile per le immagini
+  const getImageUrl = useCallback((imgName) => {
+    if (!imgName) return 'https://via.placeholder.com/400x250?text=Immagine+Non+Disponibile';
+    if (imgName.startsWith('http')) return imgName;
+    return `/images/${imgName}`;
+  }, []);
 
   const handleLoginSuccess = (userData) => {
     setUser(userData);
@@ -50,12 +54,6 @@ useEffect(() => {
     setShowResults(true);
     setSelectedVehicle(null);
     setIsAuthOpen(false);
-  };
-
-  const getImageUrl = (imgName) => {
-    if (!imgName) return 'https://via.placeholder.com/400x250?text=Immagine+Non+Disponibile';
-    if (imgName.startsWith('http')) return imgName;
-    return `/images/${imgName}`;
   };
 
   return (
@@ -78,7 +76,11 @@ useEffect(() => {
           )}
 
           {selectedVehicle ? (
-            <VehicleDetail vehicle={selectedVehicle} onBack={() => setSelectedVehicle(null)} getImageUrl={getImageUrl} />
+            <VehicleDetail 
+              vehicle={selectedVehicle} 
+              onBack={() => setSelectedVehicle(null)} 
+              getImageUrl={getImageUrl} 
+            />
           ) : !showResults ? (
             <HeroCarousel onExplore={handleSearchClick} />
           ) : (
