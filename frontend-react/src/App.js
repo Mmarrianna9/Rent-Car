@@ -18,28 +18,21 @@ function App() {
 
   // 3. Estraiamo in modo sicuro la lingua a 2 lettere (it, en, ro, ru)
   const currentLang = i18n.language ? i18n.language.substring(0, 2) : 'it';
-  useEffect(() => {
-    // Passiamo l'header con la lingua corrente a Spring Boot
-    axios.get('https://rent-car-hs75.onrender.com/api/vehicles', {
-      headers: {
-        'Accept-Language': currentLang
-      }
-    })
-      .then(res => {
-        setVehicles(res.data);
+ 
+useEffect(() => {
+  // Passiamo l'header con la lingua corrente
+  axios.get('https://rent-car-hs75.onrender.com/api/vehicles', {
+    headers: {
+      'Accept-Language': currentLang
+    }
+  })
+  .then(res => {
+    setVehicles(res.data);
+  })
+  .catch(err => console.error("Errore database:", err));
 
-        // Se l'utente sta guardando i dettagli di un veicolo 
-        // e cambia lingua, aggiorniamo anche il veicolo selezionato con la nuova descrizione!
-        if (selectedVehicle) {
-          const updatedVehicle = res.data.find(v => v.id === selectedVehicle.id);
-          if (updatedVehicle) {
-            setSelectedVehicle(updatedVehicle);
-          }
-        }
-      })
-      .catch(err => console.error("Errore database:", err));
-
-  }, [currentLang, selectedVehicle]);
+}, [currentLang]);
+        
   // 👈 5. FONDAMENTALE: Ogni volta che currentLang cambia, React riesegue questo blocco!
 
   const handleLoginSuccess = (userData) => {
