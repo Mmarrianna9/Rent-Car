@@ -4,7 +4,7 @@ import { useTranslation } from 'react-i18next';
 import axios from 'axios';
 
 //const AI_API_URL = process.env.REACT_APP_AI_API_URL || "http://127.0.0.1:8000";
-const AI_API_URL = "https://rent-car-ai-engine.onrender.com";
+const AI_API_URL = "https://rentcar-ai-engine.onrender.com";
 const VehicleDetail = ({ vehicle, onBack, getImageUrl }) => {
   const [mainImage, setMainImage] = useState(null);
   const [loading, setLoading] = useState(false);
