@@ -1,5 +1,5 @@
 import React, { useState } from 'react';
-import { Home, Search, Globe, Menu, X, User } from 'lucide-react';
+import { Home, Search, Menu, X, User } from 'lucide-react';
 import { useTranslation } from 'react-i18next';
 
 const Navbar = ({ onHomeClick, onAuthClick, onSearchClick }) => {
@@ -20,22 +20,19 @@ const Navbar = ({ onHomeClick, onAuthClick, onSearchClick }) => {
           <img src="/images/logo/logo.png" alt="RentCar" style={{ height: '35px' }} />
         </div>
 
-        {/* Parte destra: Selettore Lingua + Pulsante Menu (Hamburger) */}
+        {/* Parte destra: Selettore Lingua (senza mappamondo) + Menu Hamburger */}
         <div style={{ display: 'flex', alignItems: 'center', gap: '15px' }}>
-          {/* Selettore Lingua */}
-          <div style={{ display: 'flex', alignItems: 'center', gap: '5px' }}>
-            <Globe size={16} color="#d4a373" />
-            <select
-              value={currentLang}
-              onChange={(e) => changeLanguage(e.target.value)}
-              style={selectStyle}
-            >
-              <option value="it" style={optionStyle}>IT</option>
-              <option value="en" style={optionStyle}>EN</option>
-              <option value="ru" style={optionStyle}>RU</option>
-              <option value="ro" style={optionStyle}>RO</option>
-            </select>
-          </div>
+          {/* Selettore Lingua Pulito */}
+          <select
+            value={currentLang}
+            onChange={(e) => changeLanguage(e.target.value)}
+            style={selectStyle}
+          >
+            <option value="it" style={optionStyle}>IT</option>
+            <option value="en" style={optionStyle}>EN</option>
+            <option value="ru" style={optionStyle}>RU</option>
+            <option value="ro" style={optionStyle}>RO</option>
+          </select>
 
           {/* Icona Menu Hamburger */}
           <div 
@@ -47,7 +44,7 @@ const Navbar = ({ onHomeClick, onAuthClick, onSearchClick }) => {
         </div>
       </nav>
 
-      {/* Menu a comparsa con icone e descrizioni (visibile solo dopo aver cliccato il menu) */}
+      {/* Menu a comparsa */}
       {menuOpen && (
         <div style={dropdownMenuStyle}>
           <div 
@@ -78,7 +75,7 @@ const Navbar = ({ onHomeClick, onAuthClick, onSearchClick }) => {
           >
             <Search size={20} color="#d4a373" />
             <div>
-              <span style={menuItemTitleStyle}>Cerca Veicolo</span>
+              <span style={menuItemTitleStyle}>Cerca macchina</span>
               <p style={menuItemDescStyle}>Trova l'auto perfetta per le tue esigenze</p>
             </div>
           </div>
@@ -97,12 +94,12 @@ const navStyle = {
 };
 
 const selectStyle = {
-  background: 'transparent',
+  background: '#1a1a1b',
   color: '#fefae0',
   border: '1px solid #d4a373',
   borderRadius: '8px',
-  padding: '2px 5px',
-  fontSize: '12px',
+  padding: '4px 8px',
+  fontSize: '13px',
   outline: 'none',
   cursor: 'pointer',
   fontWeight: 'bold'
