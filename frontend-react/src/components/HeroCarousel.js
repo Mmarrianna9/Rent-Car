@@ -25,35 +25,35 @@ const HeroCarousel = ({ onExplore }) => {
   ];
 
   return (
-    <div style={{ width: '100%', height: 'calc(100vh - 50px)', overflow: 'hidden', backgroundColor: '#1a1a1b' }}>
+    <div style={{ width: '100%', height: '50vh', overflow: 'hidden', backgroundColor: '#1a1a1b' }}>
       <Carousel 
         autoPlay 
         infiniteLoop 
         showStatus={false} 
         showThumbs={false} 
-        interval={7000} // Durata estesa 
+        interval={7000} 
         transitionTime={1200}
         stopOnHover={false}
       >
         {slides.map((slide, index) => (
-          <div key={index} style={{ position: 'relative', height: 'calc(100vh - 50px)' }}>
+          <div key={index} style={{ position: 'relative', height: '50vh' }}>
             <img src={slide.img} style={{ height: '100%', width: '100%', objectFit: 'cover' }} alt={slide.title} />
             <div style={{ 
               position: 'absolute', top: 0, left: 0, width: '100%', height: '100%', 
-              background: 'linear-gradient(to top, rgba(0,0,0,0.8), transparent)', 
+              background: 'linear-gradient(to top, rgba(0,0,0,0.85), rgba(0,0,0,0.4))', 
               display: 'flex', flexDirection: 'column', justifyContent: 'center', alignItems: 'center', padding: '0 20px' 
             }}>
               <div style={{ textAlign: 'center', maxWidth: '800px' }}>
-                <h2 style={{ color: 'white', fontSize: '50px', fontWeight: '900', margin: 0, fontStyle: 'italic', textTransform: 'uppercase' }}>
+                <h2 style={{ color: 'white', fontSize: '28px', fontWeight: '900', margin: 0, fontStyle: 'italic', textTransform: 'uppercase' }}>
                   {slide.title.split(' ')[0]} <span style={{ color: '#d4a373' }}>{slide.title.split(' ').slice(1).join(' ')}</span>
                 </h2>
-                <p style={{ color: '#fefae0', fontSize: '20px', marginTop: '15px' }}>{slide.desc}</p>
+                <p style={{ color: '#fefae0', fontSize: '14px', marginTop: '8px', maxWidth: '500px', marginInline: 'auto' }}>{slide.desc}</p>
                 <button 
                   onClick={onExplore}
                   style={{ 
-                    marginTop: '30px', padding: '12px 35px', backgroundColor: '#d4a373', 
+                    marginTop: '15px', padding: '8px 25px', backgroundColor: '#d4a373', 
                     color: '#1a1a1b', border: 'none', borderRadius: '50px', 
-                    fontWeight: 'bold', cursor: 'pointer' 
+                    fontWeight: 'bold', cursor: 'pointer', fontSize: '12px' 
                   }}
                 >
                   {slide.btn}

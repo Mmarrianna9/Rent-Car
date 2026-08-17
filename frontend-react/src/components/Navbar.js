@@ -1,12 +1,11 @@
-import React from 'react';
-import { Home, Search, Globe } from 'lucide-react';
+import React, { useState } from 'react';
+import { Home, Search, Globe, Menu, X, User } from 'lucide-react';
 import { useTranslation } from 'react-i18next';
 
 const Navbar = ({ onHomeClick, onAuthClick, onSearchClick }) => {
   const { t, i18n } = useTranslation();
+  const [menuOpen, setMenuOpen] = useState(false);
 
-  // Estraiamo in modo sicuro la lingua corrente (prendendo solo i primi 2 caratteri)
-  // Se i18n.language è 'it-IT' o 'it-CH', diventerà semplicemente 'it'
   const currentLang = i18n.language ? i18n.language.substring(0, 2) : 'it';
 
   const changeLanguage = (lng) => {
@@ -14,52 +13,87 @@ const Navbar = ({ onHomeClick, onAuthClick, onSearchClick }) => {
   };
 
   return (
-    <nav style={navStyle}>
-      {/* Logo in public/images/logo/logo.png */}
-      <div style={{ cursor: 'pointer' }} onClick={onHomeClick}>
-        <img src="/images/logo/logo.png" alt="RentCar" style={{ height: '40px' }} />
-      </div>
-
-      <div style={{ display: 'flex', alignItems: 'center', gap: '25px' }}>
-        <Home size={18} onClick={onHomeClick} style={{ cursor: 'pointer' }} />
-
-        {/* Pulsante Accedi / Registrati Tradotto dinamicamente */}
-        <button onClick={onAuthClick} style={btnStyle}>
-          {t('nav.loginRegister', 'ACCEDI / REGISTRATI')}
-        </button>
-
-        <Search size={18} onClick={onSearchClick} style={{ cursor: 'pointer' }} />
-
-        {/* 🌐 SELETTORE DELLA LINGUA STILIZZATO INLINE */}
-        <div style={{ display: 'flex', alignItems: 'center', gap: '5px', marginLeft: '10px' }}>
-          <Globe size={16} color="#d4a373" />
-          <select
-            value={currentLang} /* 👈 MODIFICATO: Usa la stringa pulita a due lettere */
-            onChange={(e) => changeLanguage(e.target.value)}
-            style={selectStyle}
-          >
-            <option value="it" style={optionStyle}> IT</option>
-            <option value="en" style={optionStyle}> EN</option>
-            <option value="ru" style={optionStyle}> RU</option>
-            <option value="ro" style={optionStyle}> RO</option>
-          </select>
+    <>
+      <nav style={navStyle}>
+        {/* Logo */}
+        <div style={{ cursor: 'pointer' }} onClick={() => { onHomeClick(); setMenuOpen(false); }}>
+          <img src="/images/logo/logo.png" alt="RentCar" style={{ height: '35px' }} />
         </div>
-      </div>
-    </nav>
+
+        {/* Parte destra: Selettore Lingua + Pulsante Menu (Hamburger) */}
+        <div style={{ display: 'flex', alignItems: 'center', gap: '15px' }}>
+          {/* Selettore Lingua */}
+          <div style={{ display: 'flex', alignItems: 'center', gap: '5px' }}>
+            <Globe size={16} color="#d4a373" />
+            <select
+              value={currentLang}
+              onChange={(e) => changeLanguage(e.target.value)}
+              style={selectStyle}
+            >
+              <option value="it" style={optionStyle}>IT</option>
+              <option value="en" style={optionStyle}>EN</option>
+              <option value="ru" style={optionStyle}>RU</option>
+              <option value="ro" style={optionStyle}>RO</option>
+            </select>
+          </div>
+
+          {/* Icona Menu Hamburger */}
+          <div 
+            onClick={() => setMenuOpen(!menuOpen)} 
+            style={{ cursor: 'pointer', display: 'flex', alignItems: 'center', color: '#d4a373' }}
+          >
+            {menuOpen ? <X size={26} /> : <Menu size={26} />}
+          </div>
+        </div>
+      </nav>
+
+      {/* Menu a comparsa con icone e descrizioni (visibile solo dopo aver cliccato il menu) */}
+      {menuOpen && (
+        <div style={dropdownMenuStyle}>
+          <div 
+            style={menuItemStyle} 
+            onClick={() => { onHomeClick(); setMenuOpen(false); }}
+          >
+            <Home size={20} color="#d4a373" />
+            <div>
+              <span style={menuItemTitleStyle}>Home</span>
+              <p style={menuItemDescStyle}>Torna alla pagina principale</p>
+            </div>
+          </div>
+
+          <div 
+            style={menuItemStyle} 
+            onClick={() => { onAuthClick(); setMenuOpen(false); }}
+          >
+            <User size={20} color="#d4a373" />
+            <div>
+              <span style={menuItemTitleStyle}>{t('nav.loginRegister', 'ACCEDI / REGISTRATI')}</span>
+              <p style={menuItemDescStyle}>Gestisci il tuo account o registrati</p>
+            </div>
+          </div>
+
+          <div 
+            style={menuItemStyle} 
+            onClick={() => { onSearchClick(); setMenuOpen(false); }}
+          >
+            <Search size={20} color="#d4a373" />
+            <div>
+              <span style={menuItemTitleStyle}>Cerca Veicolo</span>
+              <p style={menuItemDescStyle}>Trova l'auto perfetta per le tue esigenze</p>
+            </div>
+          </div>
+        </div>
+      )}
+    </>
   );
 };
 
-// I tuoi stili originali intatti
+// Stili CSS
 const navStyle = {
   backgroundColor: '#1a1a1b', color: '#fefae0', display: 'flex',
   justifyContent: 'space-between', alignItems: 'center',
-  padding: '0 40px', height: '60px', borderBottom: '1px solid #d4a373',
+  padding: '0 20px', height: '60px', borderBottom: '1px solid #d4a373',
   position: 'sticky', top: 0, zIndex: 1000
-};
-
-const btnStyle = {
-  border: '1px solid #d4a373', padding: '4px 15px', borderRadius: '15px',
-  fontSize: '11px', background: 'transparent', color: 'white', cursor: 'pointer', fontWeight: 'bold'
 };
 
 const selectStyle = {
@@ -77,6 +111,43 @@ const selectStyle = {
 const optionStyle = {
   backgroundColor: '#1a1a1b',
   color: '#fefae0'
+};
+
+const dropdownMenuStyle = {
+  position: 'absolute',
+  top: '60px',
+  left: 0,
+  width: '100%',
+  backgroundColor: '#1a1a1b',
+  borderBottom: '2px solid #d4a373',
+  boxShadow: '0px 8px 16px rgba(0,0,0,0.5)',
+  zIndex: 999,
+  display: 'flex',
+  flexDirection: 'column',
+  padding: '10px 0'
+};
+
+const menuItemStyle = {
+  display: 'flex',
+  alignItems: 'center',
+  gap: '15px',
+  padding: '15px 25px',
+  cursor: 'pointer',
+  borderBottom: '1px solid rgba(212, 163, 115, 0.15)',
+  transition: 'background 0.2s'
+};
+
+const menuItemTitleStyle = {
+  color: '#fefae0',
+  fontSize: '14px',
+  fontWeight: 'bold',
+  display: 'block'
+};
+
+const menuItemDescStyle = {
+  color: '#a5a5a5',
+  fontSize: '11px',
+  margin: '2px 0 0 0'
 };
 
 export default Navbar;
